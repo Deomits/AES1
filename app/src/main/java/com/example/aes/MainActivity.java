@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -46,6 +47,31 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+        decBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    outputString = decrypt(outputString,inputPassword.getText().toString());
+
+                } catch (Exception e) {
+                    Toast.makeText(MainActivity.this, "WrongPassword", Toast.LENGTH_SHORT).show();
+                    e.printStackTrace();
+                }
+                outputText.setText(outputString);
+            }
+        });
+
+    }
+
+    private String decrypt(String outputString, String password) throws Exception{
+        SecretKeySpec key = generateKey(password);
+        Cipher c = Cipher.getInstance(AES);
+        c.init(Cipher.DECRYPT_MODE, key);
+        byte[] decodedValue = Base64.decode(outputString, Base64.DEFAULT);
+        byte[] decValue = c.doFinal(decodedValue);
+        String decryptedValue =new String(decValue);
+        return decryptedValue;
     }
 
     private String encrypt(String Data, String password) throws Exception{
